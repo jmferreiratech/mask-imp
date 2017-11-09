@@ -1,0 +1,15 @@
+{
+  "name": "mask-number",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Marcelo Ferreira",
+  "license": "ISC",
+  "dependencies": {
+    "jest": "^21.2.1",
+    "jquery-mask-plugin": "^1.14.12"
+  }
+}
