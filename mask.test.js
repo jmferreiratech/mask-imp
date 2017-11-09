@@ -30,8 +30,27 @@ test("ignore intra match", () => {
         .toEqual(["12"]);
 });
 
-test("mask", () => {
+test("direct mask", () => {
     const Masker = MaskImp("0.00");
     expect(["2", "29", "293", "2934"].map(Masker.masked.bind(Masker)))
+        .toEqual(["2", "2.9", "2.93", "2.93"]);
+});
+
+/*
+test("reverse mask", () => {
+    const Masker = MaskImp("00.0", {reverse: true});
+    expect(["2", "29", "293", "2934"].map(Masker.masked.bind(Masker)))
+        .toEqual(["2", "2.9", "29.3", "29.3"]);
+});
+*/
+test("mask integer", () => {
+    const Masker = MaskImp("0.00");
+    expect([2, 29, 293, 2934].map(Masker.masked.bind(Masker)))
+        .toEqual(["2", "2.9", "2.93", "2.93"]);
+});
+
+test("mask float", () => {
+    const Masker = MaskImp("0.00");
+    expect([2.0, 2.9, 2.93, 2.934].map(Masker.masked.bind(Masker)))
         .toEqual(["2", "2.9", "2.93", "2.93"]);
 });
