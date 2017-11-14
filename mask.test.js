@@ -31,9 +31,19 @@ test("ignore intra match", () => {
 });
 
 test("direct mask", () => {
-    const Masker = MaskImp("00.0");
-    expect(["2", "29", "293", "2934"].map(Masker.masked.bind(Masker)))
-        .toEqual(["2", "29", "29.3", "29.3"]);
+    const cpf = "000.000.000-00";
+    const Masker = MaskImp(cpf);
+    expect(Masker.masked("6")).toBe("6");
+    expect(Masker.masked("66")).toBe("66");
+    expect(Masker.masked("668")).toBe("668");
+    expect(Masker.masked("6685")).toBe("668.5");
+    expect(Masker.masked("66853")).toBe("668.53");
+    expect(Masker.masked("668533")).toBe("668.533");
+    expect(Masker.masked("6685333")).toBe("668.533.3");
+    expect(Masker.masked("66853335")).toBe("668.533.35");
+    expect(Masker.masked("668533350")).toBe("668.533.350");
+    expect(Masker.masked("6685333502")).toBe("668.533.350-2");
+    expect(Masker.masked("66853335023")).toBe("668.533.350-23");
 });
 
 test("reverse mask", () => {
