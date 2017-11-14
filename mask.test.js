@@ -65,7 +65,15 @@ test("mask float", () => {
 });
 
 test("recursive reverse mask", () => {
-    const Masker = MaskImp("#0.00", {reverse: true});
-    expect(["2", "29", "293", "2934", "29345", ].map(Masker.masked.bind(Masker)))
-        .toEqual(["2", "29", "2.93", "29.34", "293.45"]);
+    const number = "#.##0,00";
+    const Masker = MaskImp(number, {reverse: true});
+    expect(Masker.masked("1")).toBe("1");
+    expect(Masker.masked("12")).toBe("12");
+    expect(Masker.masked("123")).toBe("1,23");
+    expect(Masker.masked("1234")).toBe("12,34");
+    expect(Masker.masked("12345")).toBe("123,45");
+    expect(Masker.masked("123456")).toBe("1.234,56");
+    expect(Masker.masked("1234567")).toBe("12.345,67");
+    expect(Masker.masked("12345678")).toBe("123.456,78");
+    expect(Masker.masked("123456789")).toBe("1.234.567,89");
 });

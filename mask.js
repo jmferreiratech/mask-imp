@@ -21,19 +21,23 @@ class MaskImp {
         return this._config.reverse ? buf.reverse().join("") : buf.join("");
     }
 
-    _maskIt(mask, value, result = []) {
+    _maskIt(mask, value, result = [], resetPos = null) {
         if (mask.length === 0 || value.length === 0)
             return result;
         const trans = translation[mask[0]];
         if (trans) {
             if (value.charAt(0).match(trans.pattern)) {
-                if (trans.recursive)
-                    return this._maskIt(mask, value.substring(1), result.concat(value.charAt(0)));
-                return this._maskIt(mask.substring(1), value.substring(1), result.concat(value.charAt(0)));
+                if (trans.recursive) {
+                    if (!resetPos)
+                        resetPos = mask;
+                    else if (mask.length === 1)
+                        return this._maskIt(resetPos, value.substring(1), result.concat(value.charAt(0)), resetPos);
+                }
+                return this._maskIt(mask.substring(1), value.substring(1), result.concat(value.charAt(0)), resetPos);
             }
-            return this._maskIt(mask, value.substring(1), result);
+            return this._maskIt(mask, value.substring(1), result, resetPos);
         }
-        return this._maskIt(mask.substring(1), value, result.concat(mask[0]));
+        return this._maskIt(mask.substring(1), value, result.concat(mask[0]), resetPos);
     }
 }
 
