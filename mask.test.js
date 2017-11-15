@@ -77,3 +77,15 @@ test("recursive reverse mask", () => {
     expect(Masker.masked("12345678")).toBe("123.456,78");
     expect(Masker.masked("123456789")).toBe("1.234.567,89");
 });
+
+test("mask with optional digits", () => {
+    const ip = "099.099.099.099";
+    const Masker = MaskImp(ip);
+    expect(Masker.masked("8.")).toBe("8.");
+    expect(Masker.masked("8.8")).toBe("8.8");
+    expect(Masker.masked("8.8.8.8")).toBe("8.8.8.8");
+    expect(Masker.masked("16.16.16.16")).toBe("16.16.16.16");
+    expect(Masker.masked("255.255.255.255")).toBe("255.255.255.255");
+    expect(Masker.masked("192.168.0.1")).toBe("192.168.0.1");
+    expect(Masker.masked("000000000000")).toBe("000.000.000.000");
+});

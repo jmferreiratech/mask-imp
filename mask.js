@@ -1,6 +1,7 @@
 const translation = {
     "0": {pattern: /\d/},
-    '#': {pattern: /\d/, recursive: true},
+    "#": {pattern: /\d/, recursive: true},
+    "9": {pattern: /\d/, optional: true},
 };
 
 class MaskImp {
@@ -35,6 +36,8 @@ class MaskImp {
                 }
                 return this._maskIt(mask.substring(1), value.substring(1), result.concat(value.charAt(0)), resetPos);
             }
+            if (trans.optional)
+                return this._maskIt(mask.substring(1), value, result, resetPos);
             return this._maskIt(mask, value.substring(1), result, resetPos);
         }
         return this._maskIt(mask.substring(1), value, result.concat(mask[0]), resetPos);
