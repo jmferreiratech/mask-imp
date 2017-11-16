@@ -107,6 +107,15 @@ test("mask with suffix", () => {
     expect(Masker.masked("1234")).toBe("1,23 €");
 });
 
+test("mask with prefix", () => {
+    const money = "R$ 0,00";
+    const Masker = MaskImp(money);
+    expect(Masker.masked("1")).toBe("R$ 1");
+    expect(Masker.masked("12")).toBe("R$ 1,2");
+    expect(Masker.masked("123")).toBe("R$ 1,23");
+    expect(Masker.masked("1234")).toBe("R$ 1,23");
+});
+
 test("mask with suffix", () => {
     const money = "0,00 €";
     const Masker = MaskImp(money, {reverse: true});
