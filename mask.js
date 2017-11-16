@@ -24,7 +24,7 @@ class MaskImp {
 
     _maskIt(mask, value, result = [], resetPos = null) {
         if (mask.length === 0 || value.length === 0)
-            return result;
+            return [...result, ...this._suffix(mask)];
         const trans = translation[mask[0]];
         if (trans) {
             if (value.charAt(0).match(trans.pattern)) {
@@ -41,6 +41,15 @@ class MaskImp {
             return this._maskIt(mask, value.substring(1), result, resetPos);
         }
         return this._maskIt(mask.substring(1), value, result.concat(mask[0]), resetPos);
+    }
+
+    _suffix(mask) {
+        const reversedMask = mask.split("").reverse();
+        const lastMapChar = reversedMask.findIndex(m => !!translation[m]);
+        return reversedMask
+            .filter((m, i) => i < lastMapChar || lastMapChar === -1)
+            .reverse()
+            .join("");
     }
 }
 

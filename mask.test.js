@@ -89,3 +89,29 @@ test("mask with optional digits", () => {
     expect(Masker.masked("192.168.0.1")).toBe("192.168.0.1");
     expect(Masker.masked("000000000000")).toBe("000.000.000.000");
 });
+
+test("constant mask", () => {
+    const Masker = MaskImp("ABC123");
+    expect(Masker.masked("")).toBe("ABC123");
+    expect(Masker.masked("21")).toBe("ABC123");
+    expect(Masker.masked("448")).toBe("ABC123");
+    expect(Masker.masked("1824")).toBe("ABC123");
+});
+
+test("mask with suffix", () => {
+    const money = "0,00 €";
+    const Masker = MaskImp(money);
+    expect(Masker.masked("1")).toBe("1 €");
+    expect(Masker.masked("12")).toBe("1,2 €");
+    expect(Masker.masked("123")).toBe("1,23 €");
+    expect(Masker.masked("1234")).toBe("1,23 €");
+});
+
+test("mask with suffix", () => {
+    const money = "0,00 €";
+    const Masker = MaskImp(money, {reverse: true});
+    expect(Masker.masked("1")).toBe("1 €");
+    expect(Masker.masked("12")).toBe("12 €");
+    expect(Masker.masked("123")).toBe("1,23 €");
+    expect(Masker.masked("1234")).toBe("2,34 €");
+});
