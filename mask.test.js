@@ -124,3 +124,13 @@ test("mask with suffix", () => {
     expect(Masker.masked("123")).toBe("1,23 €");
     expect(Masker.masked("1234")).toBe("2,34 €");
 });
+
+test("reverse recursive mask with default value", () => {
+    const money = "#.##0,00";
+    const Masker = MaskImp(money, {default: true, reverse: true});
+    expect(Masker.masked("")).toBe("0,00");
+    expect(Masker.masked("1")).toBe("0,01");
+    expect(Masker.masked("12")).toBe("0,12");
+    expect(Masker.masked("123")).toBe("1,23");
+    expect(Masker.masked("1234")).toBe("12,34");
+});

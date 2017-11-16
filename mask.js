@@ -44,12 +44,10 @@ class MaskImp {
     }
 
     _suffix(mask) {
-        const reversedMask = mask.split("").reverse();
-        const lastMapChar = reversedMask.findIndex(m => !!translation[m]);
-        return reversedMask
-            .filter((m, i) => i < lastMapChar || lastMapChar === -1)
-            .reverse()
-            .join("");
+        const reversedMask = this._config.reverse && this._config.default ? mask.split("") : mask.split("").reverse();
+        const lastMapChar = reversedMask.findIndex(m => !!translation[m] && (!this._config.default || (translation[m].optional || translation[m].recursive)));
+        const result = reversedMask.filter((m, i) => i < lastMapChar || lastMapChar === -1);
+        return this._config.reverse && this._config.default ? result.join("") : result.reverse().join("");
     }
 }
 
