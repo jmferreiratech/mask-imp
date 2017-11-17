@@ -6,7 +6,7 @@ const translation = {
 
 class MaskImp {
 
-    constructor(mask, config = {}) {
+    constructor(mask, config = {reverse: false, default: false}) {
         this._mask = mask;
         this._config = config;
     }
@@ -20,6 +20,17 @@ class MaskImp {
         }
         const buf = this._maskIt(mask, value);
         return this._config.reverse ? buf.reverse().join("") : buf.join("");
+    }
+
+    unmasked(value) {
+        const mask = typeof this._mask === 'function' ? this._mask(value) : this._mask;
+        let result = value;
+        mask.split("")
+            .filter(m => !translation[m] || this._config.default)
+            .forEach(m => {
+                result = result.replace(m, "");
+            });
+        return result;
     }
 
     _maskIt(mask, value, result = [], resetPos = null) {
