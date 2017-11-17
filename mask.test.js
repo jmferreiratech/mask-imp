@@ -134,3 +134,17 @@ test("reverse recursive mask with default value", () => {
     expect(Masker.masked("123")).toBe("1,23");
     expect(Masker.masked("1234")).toBe("12,34");
 });
+
+test("functional mask", () => {
+    const phoneNumber = val => val.length <= 8 ? "0000-0000" : "9 0000-0000";
+    const Masker = MaskImp(phoneNumber);
+    expect(Masker.masked("9")).toBe("9");
+    expect(Masker.masked("99")).toBe("99");
+    expect(Masker.masked("997")).toBe("997");
+    expect(Masker.masked("9972")).toBe("9972");
+    expect(Masker.masked("99725")).toBe("9972-5");
+    expect(Masker.masked("997253")).toBe("9972-53");
+    expect(Masker.masked("9972534")).toBe("9972-534");
+    expect(Masker.masked("99725348")).toBe("9972-5348");
+    expect(Masker.masked("997253486")).toBe("9 9725-3486");
+});

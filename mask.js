@@ -13,7 +13,7 @@ class MaskImp {
 
     masked(value) {
         value += "";
-        let mask = this._mask;
+        let mask = typeof this._mask === 'function' ? this._mask(value) : this._mask;
         if (this._config.reverse) {
             mask = mask.split("").reverse().join("");
             value = value.split("").reverse().join("");
