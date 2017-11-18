@@ -24,9 +24,12 @@ class MaskImp {
 
     unmasked(value) {
         const mask = typeof this._mask === 'function' ? this._mask(value) : this._mask;
-        let result = value;
+
+        const index = value.split("").findIndex(c => !mask.includes(c));
+        let result = index >= 0 ? value.slice(index) : "";
+
         mask.split("")
-            .filter(m => !translation[m] || this._config.default)
+            .filter(m => !translation[m])
             .forEach(m => {
                 result = result.replace(m, "");
             });

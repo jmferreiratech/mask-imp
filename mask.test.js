@@ -171,9 +171,9 @@ test("reverse recursive unmask with default value", () => {
     const Masker = MaskImp(money, {default: true, reverse: true});
     expect(Masker.unmasked(Masker.masked(""))).toBe("");
     expect(Masker.unmasked(Masker.masked("1"))).toBe("1");
-    expect(Masker.unmasked(Masker.masked("12"))).toBe("12");
-    expect(Masker.unmasked(Masker.masked("123"))).toBe("123");
-    expect(Masker.unmasked(Masker.masked("1234"))).toBe("1234");
+    expect(Masker.unmasked(Masker.masked("10"))).toBe("10");
+    expect(Masker.unmasked(Masker.masked("103"))).toBe("103");
+    expect(Masker.unmasked(Masker.masked("1034"))).toBe("1034");
 });
 
 test("reverse fixed unmask with suffix", () => {
@@ -189,7 +189,7 @@ test("direct fixed unmask with prefix", () => {
     const money = "R$ 0,00";
     const Masker = MaskImp(money);
     expect(Masker.unmasked(Masker.masked("1"))).toBe("1");
-    expect(Masker.unmasked(Masker.masked("12"))).toBe("12");
-    expect(Masker.unmasked(Masker.masked("123"))).toBe("123");
-    expect(Masker.unmasked(Masker.masked("1234"))).toBe("123");
+    expect(Masker.unmasked(Masker.masked("10"))).toBe("10");
+    expect(Masker.unmasked(Masker.masked("103"))).toBe("103");
+    expect(Masker.unmasked(Masker.masked("1034"))).toBe("103");
 });
