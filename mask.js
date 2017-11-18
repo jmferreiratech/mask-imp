@@ -6,7 +6,7 @@ const translation = {
 
 class MaskImp {
 
-    constructor(mask, config = {reverse: false, default: false}) {
+    constructor(mask, config = {reverse: false, default: false, hint: false}) {
         this._mask = mask;
         this._config = config;
     }
@@ -29,7 +29,7 @@ class MaskImp {
         let result = index >= 0 ? value.slice(index) : "";
 
         mask.split("")
-            .filter(m => !translation[m])
+            .filter(isConstant)
             .forEach(m => {
                 result = result.replace(m, "");
             });
@@ -39,8 +39,8 @@ class MaskImp {
     _maskIt(mask, value, result = [], resetPos = null) {
         if (mask.length === 0 || value.length === 0)
             return [...result, ...this._suffix(mask)];
-        const trans = translation[mask[0]];
-        if (trans) {
+        if (!isConstant(mask[0])) {
+            const trans = translation[mask[0]];
             if (value.charAt(0).match(trans.pattern)) {
                 if (trans.recursive) {
                     if (!resetPos)
@@ -58,11 +58,20 @@ class MaskImp {
     }
 
     _suffix(mask) {
+        let cte = "";
+        if (this._config.hint && isConstant(mask[0])) {
+            cte = mask[0];
+            mask = mask.slice(1);
+        }
         const reversedMask = this._config.reverse && this._config.default ? mask.split("") : mask.split("").reverse();
-        const lastMapChar = reversedMask.findIndex(m => !!translation[m] && (!this._config.default || (translation[m].optional || translation[m].recursive)));
+        const lastMapChar = reversedMask.findIndex(m => !isConstant(m) && (!this._config.default || (translation[m].optional || translation[m].recursive)));
         const result = reversedMask.filter((m, i) => i < lastMapChar || lastMapChar === -1);
-        return this._config.reverse && this._config.default ? result.join("") : result.reverse().join("");
+        return cte + (this._config.reverse && this._config.default ? result.join("") : result.reverse().join(""));
     }
+}
+
+function isConstant(maskChar) {
+    return maskChar && !translation[maskChar];
 }
 
 module.exports = (mask, config) => new MaskImp(mask, config);

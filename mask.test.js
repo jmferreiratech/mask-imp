@@ -193,3 +193,10 @@ test("direct fixed unmask with prefix", () => {
     expect(Masker.unmasked(Masker.masked("103"))).toBe("103");
     expect(Masker.unmasked(Masker.masked("1034"))).toBe("103");
 });
+
+test("direct mask with prefix that shows next constant", () => {
+    const money = "R$ 0,00";
+    const Masker = MaskImp(money, {hint: true});
+    expect(Masker.masked("1")).toBe("R$ 1,");
+    expect(Masker.masked("123")).toBe("R$ 1,23");
+});
