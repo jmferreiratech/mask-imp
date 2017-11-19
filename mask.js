@@ -4,31 +4,29 @@ const translation = {
     "9": {pattern: /\d/, optional: true},
 };
 
+const reversed = (f, reverse = true) => (...params) => reverse ? f(...params.map(p => p.reverse())).reverse() : f(...params);
+
 class MaskImp {
 
     constructor(mask, config = {reverse: false, default: false, hint: false}) {
-        this._mask = mask;
+        this._mask = typeof mask === 'function' ? mask : () => mask;
         this._config = config;
     }
 
-    masked(value) {
-        value += "";
-        let mask = typeof this._mask === 'function' ? this._mask(value) : this._mask;
-        if (this._config.reverse) {
-            mask = mask.split("").reverse().join("");
-            value = value.split("").reverse().join("");
-        }
-        const buf = this._maskIt(mask, value);
-        return this._config.reverse ? buf.reverse().join("") : buf.join("");
+    masked(value = "") {
+        value = (value + "").split("");
+        let mask = this._mask(value).split("");
+        const maskIt = reversed(this._maskIt.bind(this), this._config.reverse === true);
+        return maskIt(mask, value).join("");
     }
 
-    unmasked(value) {
-        const mask = typeof this._mask === 'function' ? this._mask(value) : this._mask;
+    unmasked(value = "") {
+        const mask = this._mask(value).split("");
 
         const index = value.split("").findIndex(c => !mask.includes(c));
         let result = index >= 0 ? value.slice(index) : "";
 
-        mask.split("")
+        mask
             .filter(isConstant)
             .forEach(m => {
                 result = result.replace(m, "");
@@ -36,41 +34,43 @@ class MaskImp {
         return result;
     }
 
-    _maskIt(mask, value, result = [], resetPos = null) {
+    _maskIt(mask = [], value = [], result = [], resetPos = null) {
         if (mask.length === 0 || value.length === 0)
             return [...result, ...this._suffix(mask)];
-        if (!isConstant(mask[0])) {
-            const trans = translation[mask[0]];
-            if (value.charAt(0).match(trans.pattern)) {
+        const [maskChar, ...restMask] = mask;
+        if (!isConstant(maskChar)) {
+            const trans = translation[maskChar];
+            const [valueChar, ...restValue] = value;
+            if (valueChar.match(trans.pattern)) {
                 if (trans.recursive) {
                     if (!resetPos)
                         resetPos = mask;
                     else if (mask.length === 1)
-                        return this._maskIt(resetPos, value.substring(1), result.concat(value.charAt(0)), resetPos);
+                        return this._maskIt(resetPos, restValue, [...result, valueChar], resetPos);
                 }
-                return this._maskIt(mask.substring(1), value.substring(1), result.concat(value.charAt(0)), resetPos);
+                return this._maskIt(restMask, restValue, [...result, valueChar], resetPos);
             }
             if (trans.optional)
-                return this._maskIt(mask.substring(1), value, result, resetPos);
-            return this._maskIt(mask, value.substring(1), result, resetPos);
+                return this._maskIt(restMask, value, result, resetPos);
+            return this._maskIt(mask, restValue, result, resetPos);
         }
-        return this._maskIt(mask.substring(1), value, result.concat(mask[0]), resetPos);
+        return this._maskIt(restMask, value, [...result, maskChar], resetPos);
     }
 
-    _suffix(mask) {
+    _suffix(mask = []) {
         let cte = "";
-        if (this._config.hint && isConstant(mask[0])) {
-            cte = mask[0];
-            mask = mask.slice(1);
-        }
-        const reversedMask = this._config.reverse && this._config.default ? mask.split("") : mask.split("").reverse();
-        const lastMapChar = reversedMask.findIndex(m => !isConstant(m) && (!this._config.default || (translation[m].optional || translation[m].recursive)));
-        const result = reversedMask.filter((m, i) => i < lastMapChar || lastMapChar === -1);
-        return cte + (this._config.reverse && this._config.default ? result.join("") : result.reverse().join(""));
+        if (this._config.hint && isConstant(mask[0]))
+            [cte, ...mask] = mask;
+        const constantTail = mask => {
+            const lastMapChar = mask.findIndex(m => !isConstant(m) && (!this._config.default || (translation[m].optional || translation[m].recursive)));
+            return mask.filter((m, i) => i < lastMapChar || lastMapChar === -1);
+        };
+        const suffix = reversed(constantTail, !this._config.reverse || !this._config.default);
+        return [cte, ...suffix(mask)];
     }
 }
 
-function isConstant(maskChar) {
+function isConstant(maskChar = "") {
     return maskChar && !translation[maskChar];
 }
 
