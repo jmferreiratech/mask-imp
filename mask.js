@@ -1,14 +1,22 @@
+String.prototype.replaceAll = function(str1, str2, ignore) {
+    return this.replace(
+        new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), (ignore ? "gi" : "g")),
+        (typeof(str2) === "string") ? str2.replace(/\$/g,"$$$$") : str2
+    );
+};
+
 const translation = {
     "0": {pattern: /\d/},
     "#": {pattern: /\d/, recursive: true},
     "9": {pattern: /\d/, optional: true},
 };
+const placeholder = "_";
 
 const reversed = (f, reverse = true) => (...params) => reverse ? f(...params.map(p => p.reverse())).reverse() : f(...params);
 
 class MaskImp {
 
-    constructor(mask, config = {reverse: false, default: false, hint: false}) {
+    constructor(mask, config = {reverse: false, default: false, hint: false, placeholder: false}) {
         this._mask = typeof mask === 'function' ? mask : () => mask;
         this._config = config;
     }
@@ -26,11 +34,15 @@ class MaskImp {
         const index = value.split("").findIndex(c => !mask.includes(c));
         let result = index >= 0 ? value.slice(index) : "";
 
+        if (this._config.placeholder)
+            result = result.replaceAll(placeholder, "");
+
         mask
             .filter(isConstant)
             .forEach(m => {
-                result = result.replace(m, "");
+                result = result.replaceAll(m, "");
             });
+
         return result;
     }
 
@@ -59,6 +71,8 @@ class MaskImp {
 
     _suffix(mask = []) {
         let cte = "";
+        if (this._config.placeholder)
+            return mask.map(m => !isConstant(m) ? placeholder : m);
         if (this._config.hint && isConstant(mask[0]))
             [cte, ...mask] = mask;
         const constantTail = mask => {

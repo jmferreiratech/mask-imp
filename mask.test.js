@@ -200,3 +200,37 @@ test("direct mask with prefix that shows next constant", () => {
     expect(Masker.masked("1")).toBe("R$ 1,");
     expect(Masker.masked("123")).toBe("R$ 1,23");
 });
+
+test("direct mask with fixed placeholder", () => {
+    const cpf = "000.000.000-00";
+    const Masker = MaskImp(cpf, {placeholder: true});
+    expect(Masker.masked("")).toBe("___.___.___-__");
+    expect(Masker.masked("6")).toBe("6__.___.___-__");
+    expect(Masker.masked("66")).toBe("66_.___.___-__");
+    expect(Masker.masked("668")).toBe("668.___.___-__");
+    expect(Masker.masked("6685")).toBe("668.5__.___-__");
+    expect(Masker.masked("66853")).toBe("668.53_.___-__");
+    expect(Masker.masked("668533")).toBe("668.533.___-__");
+    expect(Masker.masked("6685333")).toBe("668.533.3__-__");
+    expect(Masker.masked("66853335")).toBe("668.533.35_-__");
+    expect(Masker.masked("668533350")).toBe("668.533.350-__");
+    expect(Masker.masked("6685333502")).toBe("668.533.350-2_");
+    expect(Masker.masked("66853335023")).toBe("668.533.350-23");
+});
+
+test("direct unmask with fixed placeholder", () => {
+    const cpf = "000.000.000-00";
+    const Masker = MaskImp(cpf, {placeholder: true});
+    expect(Masker.unmasked(Masker.masked(""))).toBe("");
+    expect(Masker.unmasked(Masker.masked("6"))).toBe("6");
+    expect(Masker.unmasked(Masker.masked("66"))).toBe("66");
+    expect(Masker.unmasked(Masker.masked("668"))).toBe("668");
+    expect(Masker.unmasked(Masker.masked("6685"))).toBe("6685");
+    expect(Masker.unmasked(Masker.masked("66853"))).toBe("66853");
+    expect(Masker.unmasked(Masker.masked("668533"))).toBe("668533");
+    expect(Masker.unmasked(Masker.masked("6685333"))).toBe("6685333");
+    expect(Masker.unmasked(Masker.masked("66853335"))).toBe("66853335");
+    expect(Masker.unmasked(Masker.masked("668533350"))).toBe("668533350");
+    expect(Masker.unmasked(Masker.masked("6685333502"))).toBe("6685333502");
+    expect(Masker.unmasked(Masker.masked("66853335023"))).toBe("66853335023");
+});
