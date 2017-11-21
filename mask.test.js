@@ -1,33 +1,23 @@
 const MaskImp = require("./mask");
 
-test("match to itself", () => {
+test("basic cases", () => {
     const Masker = MaskImp("0");
-    expect(["0", "1"].map(Masker.masked.bind(Masker)))
-        .toEqual(["0", "1"]);
+    expect(Masker.masked("")).toBe("");
+    expect(Masker.masked("0")).toBe("0");
+    expect(Masker.masked("1")).toBe("1");
+    expect(Masker.masked("a")).toBe("");
 });
 
-test("unmatch to empty", () => {
-    const Masker = MaskImp("0");
-    expect(["a"].map(Masker.masked.bind(Masker)))
-        .toEqual([""]);
-});
-
-test("ignore after match", () => {
-    const Masker = MaskImp("0");
-    expect(["1222"].map(Masker.masked.bind(Masker)))
-        .toEqual(["1"]);
-});
-
-test("ignore before match", () => {
-    const Masker = MaskImp("0");
-    expect(["a1"].map(Masker.masked.bind(Masker)))
-        .toEqual(["1"]);
-});
-
-test("ignore intra match", () => {
+test("ignore non match", () => {
     const Masker = MaskImp("00");
-    expect(["1a2"].map(Masker.masked.bind(Masker)))
-        .toEqual(["12"]);
+    expect(Masker.masked("1abc2")).toBe("12");
+    expect(Masker.masked("abc12")).toBe("12");
+    expect(Masker.masked("1abc2")).toBe("12");
+});
+
+test("direct mask truncate after match", () => {
+    const Masker = MaskImp("00");
+    expect(Masker.masked("12345")).toBe("12");
 });
 
 test("direct mask", () => {
@@ -46,20 +36,21 @@ test("direct mask", () => {
     expect(Masker.masked("66853335023")).toBe("668.533.350-23");
 });
 
-test("reverse mask", () => {
+test("mask can be reverse (right to left)", () => {
     const Masker = MaskImp("00.0", {reverse: true});
     expect(["2", "29", "29A", "293", "2934"].map(Masker.masked.bind(Masker)))
         .toEqual(["2", "2.9", "2.9", "29.3", "93.4"]);
 });
 
-test("mask integer", () => {
+test("reverse mask do not truncate after match", () => {
+    const Masker = MaskImp("00.0", {reverse: true});
+    expect(Masker.masked("12345")).toBe("34.5");
+});
+
+test("mask accepts number as input value", () => {
     const Masker = MaskImp("0.00");
     expect([2, 29, 293, 2934].map(Masker.masked.bind(Masker)))
         .toEqual(["2", "2.9", "2.93", "2.93"]);
-});
-
-test("mask float", () => {
-    const Masker = MaskImp("0.00");
     expect([2.0, 2.9, 2.93, 2.934].map(Masker.masked.bind(Masker)))
         .toEqual(["2", "2.9", "2.93", "2.93"]);
 });

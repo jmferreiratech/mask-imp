@@ -21,7 +21,7 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
         masked: (value = "") => {
             value = (value + "").split("");
             let mask = _mask(value).split("");
-            const maskIt = reversed(_maskIt, reverse === true);
+            const maskIt = reversed(_maskIt, reverse);
             return maskIt(mask, value).join("");
         },
         unmasked: (value = "") => {
