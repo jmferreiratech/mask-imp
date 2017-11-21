@@ -127,7 +127,7 @@ test("reverse mask with suffix", () => {
 
 test("reverse recursive mask with default value", () => {
     const money = "#.##0,00";
-    const Masker = MaskImp(money, {default: true, reverse: true});
+    const Masker = MaskImp(money, {defaultValue: true, reverse: true});
     expect(Masker.masked("")).toBe("0,00");
     expect(Masker.masked("1")).toBe("0,01");
     expect(Masker.masked("12")).toBe("0,12");
@@ -168,7 +168,7 @@ test("direct unmask", () => {
 
 test("reverse recursive unmask with default value", () => {
     const money = "#.##0,00";
-    const Masker = MaskImp(money, {default: true, reverse: true});
+    const Masker = MaskImp(money, {defaultValue: true, reverse: true});
     expect(Masker.unmasked(Masker.masked(""))).toBe("");
     expect(Masker.unmasked(Masker.masked("1"))).toBe("1");
     expect(Masker.unmasked(Masker.masked("10"))).toBe("10");
