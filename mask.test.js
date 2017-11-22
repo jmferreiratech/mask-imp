@@ -21,19 +21,22 @@ test("direct mask truncate after match", () => {
 });
 
 test("direct mask", () => {
-    const cpf = "000.000.000-00";
-    const Masker = MaskImp(cpf);
-    expect(Masker.masked("6")).toBe("6");
-    expect(Masker.masked("66")).toBe("66");
-    expect(Masker.masked("668")).toBe("668");
-    expect(Masker.masked("6685")).toBe("668.5");
-    expect(Masker.masked("66853")).toBe("668.53");
-    expect(Masker.masked("668533")).toBe("668.533");
-    expect(Masker.masked("6685333")).toBe("668.533.3");
-    expect(Masker.masked("66853335")).toBe("668.533.35");
-    expect(Masker.masked("668533350")).toBe("668.533.350");
-    expect(Masker.masked("6685333502")).toBe("668.533.350-2");
-    expect(Masker.masked("66853335023")).toBe("668.533.350-23");
+    const cnpj = "00.000.000/0000-00";
+    const Masker = MaskImp(cnpj);
+    expect(Masker.masked("2")).toBe("2");
+    expect(Masker.masked("26")).toBe("26");
+    expect(Masker.masked("263")).toBe("26.3");
+    expect(Masker.masked("2636")).toBe("26.36");
+    expect(Masker.masked("26366")).toBe("26.366");
+    expect(Masker.masked("263668")).toBe("26.366.8");
+    expect(Masker.masked("2636688")).toBe("26.366.88");
+    expect(Masker.masked("26366883")).toBe("26.366.883");
+    expect(Masker.masked("263668830")).toBe("26.366.883/0");
+    expect(Masker.masked("2636688300")).toBe("26.366.883/00");
+    expect(Masker.masked("26366883000")).toBe("26.366.883/000");
+    expect(Masker.masked("263668830001")).toBe("26.366.883/0001");
+    expect(Masker.masked("2636688300014")).toBe("26.366.883/0001-4");
+    expect(Masker.masked("26366883000141")).toBe("26.366.883/0001-41");
 });
 
 test("mask can be reverse (right to left)", () => {
@@ -92,6 +95,7 @@ test("constant mask", () => {
 test("direct mask with suffix", () => {
     const money = "0,00 €";
     const Masker = MaskImp(money);
+    expect(Masker.masked("")).toBe(" €");
     expect(Masker.masked("1")).toBe("1 €");
     expect(Masker.masked("12")).toBe("1,2 €");
     expect(Masker.masked("123")).toBe("1,23 €");
@@ -101,6 +105,7 @@ test("direct mask with suffix", () => {
 test("direct mask with prefix", () => {
     const money = "R$ 0,00";
     const Masker = MaskImp(money);
+    expect(Masker.masked("")).toBe("R$ ");
     expect(Masker.masked("1")).toBe("R$ 1");
     expect(Masker.masked("12")).toBe("R$ 1,2");
     expect(Masker.masked("123")).toBe("R$ 1,23");
@@ -110,6 +115,7 @@ test("direct mask with prefix", () => {
 test("reverse mask with suffix", () => {
     const money = "0,00 €";
     const Masker = MaskImp(money, {reverse: true});
+    expect(Masker.masked("")).toBe(" €");
     expect(Masker.masked("1")).toBe("1 €");
     expect(Masker.masked("12")).toBe("12 €");
     expect(Masker.masked("123")).toBe("1,23 €");
@@ -170,6 +176,7 @@ test("reverse recursive unmask with default value", () => {
 test("reverse fixed unmask with suffix", () => {
     const money = "0,00 €";
     const Masker = MaskImp(money, {reverse: true});
+    expect(Masker.unmasked(Masker.masked(""))).toBe("");
     expect(Masker.unmasked(Masker.masked("1"))).toBe("1");
     expect(Masker.unmasked(Masker.masked("12"))).toBe("12");
     expect(Masker.unmasked(Masker.masked("123"))).toBe("123");
@@ -179,6 +186,7 @@ test("reverse fixed unmask with suffix", () => {
 test("direct fixed unmask with prefix", () => {
     const money = "R$ 0,00";
     const Masker = MaskImp(money);
+    expect(Masker.unmasked(Masker.masked(""))).toBe("");
     expect(Masker.unmasked(Masker.masked("1"))).toBe("1");
     expect(Masker.unmasked(Masker.masked("10"))).toBe("10");
     expect(Masker.unmasked(Masker.masked("103"))).toBe("103");
@@ -188,6 +196,7 @@ test("direct fixed unmask with prefix", () => {
 test("direct mask with prefix that shows next constant", () => {
     const money = "R$ 0,00";
     const Masker = MaskImp(money, {hint: true});
+    expect(Masker.masked("")).toBe("R$ ");
     expect(Masker.masked("1")).toBe("R$ 1,");
     expect(Masker.masked("123")).toBe("R$ 1,23");
 });

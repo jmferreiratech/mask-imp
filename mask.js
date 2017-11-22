@@ -14,15 +14,28 @@ const placeholderChar = "_";
 
 const reversed = (f, reverse = true) => (...params) => reverse ? f(...params.map(p => p.reverse())).reverse() : f(...params);
 
+const breakAffix = rawMask => {
+    let startMaskIndex = rawMask.findIndex(m => !isConstant(m));
+    startMaskIndex = startMaskIndex > -1 ? startMaskIndex : rawMask.length;
+    let endMaskIndex = rawMask.length - rawMask.slice().reverse().findIndex(m => !isConstant(m));
+    endMaskIndex = endMaskIndex <= rawMask.length ? endMaskIndex : rawMask.length;
+
+    return {
+        prefix: rawMask.slice(0, startMaskIndex),
+        mask: rawMask.slice(startMaskIndex, endMaskIndex),
+        suffix: rawMask.slice(endMaskIndex),
+    };
+};
+
 const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = false, placeholder = false} = {}) => {
     const _mask = typeof mask === 'function' ? mask : () => mask;
 
     return {
         masked: (value = "") => {
             value = (value + "").split("");
-            let mask = _mask(value).split("");
+            const {prefix, mask, suffix} = breakAffix(_mask(value).split(""));
             const maskIt = reversed(_maskIt, reverse);
-            return maskIt(mask, value).join("");
+            return [...prefix, ...maskIt(mask, value), ...suffix].join("");
         },
         unmasked: (value = "") => {
             const mask = _mask(value).split("");
@@ -67,22 +80,20 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
     }
 
     function _suffix(mask = []) {
-        let cte = "";
         if (placeholder)
             return mask.map(m => !isConstant(m) ? placeholderChar : m);
-        if (hint && isConstant(mask[0]))
-            [cte, ...mask] = mask;
-        const constantTail = mask => {
-            const lastMapChar = mask.findIndex(m => !isConstant(m) && (!defaultValue || (translation[m].optional || translation[m].recursive)));
+        if (defaultValue) {
+            const lastMapChar = mask.findIndex(m => !isConstant(m) && (translation[m].optional || translation[m].recursive));
             return mask.filter((m, i) => i < lastMapChar || lastMapChar === -1);
-        };
-        const suffix = reversed(constantTail, !reverse || !defaultValue);
-        return [cte, ...suffix(mask)];
+        }
+        if (hint && isConstant(mask[0]))
+            return [mask[0]];
+        return [];
     }
 };
 
 function isConstant(maskChar = "") {
-    return maskChar && !translation[maskChar];
+    return !translation[maskChar];
 }
 
 module.exports = MaskImpFactory;
