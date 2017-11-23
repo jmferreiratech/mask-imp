@@ -77,11 +77,14 @@ test("mask with optional digits", () => {
     const Masker = MaskImp(ip);
     expect(Masker.masked("8.")).toBe("8.");
     expect(Masker.masked("8.8")).toBe("8.8");
+    expect(Masker.masked("88")).toBe("88");
     expect(Masker.masked("8.8.8.8")).toBe("8.8.8.8");
     expect(Masker.masked("16.16.16.16")).toBe("16.16.16.16");
     expect(Masker.masked("255.255.255.255")).toBe("255.255.255.255");
     expect(Masker.masked("192.168.0.1")).toBe("192.168.0.1");
     expect(Masker.masked("000000000000")).toBe("000.000.000.000");
+    expect(Masker.masked("8A8")).toBe("88");
+    expect(Masker.masked("8A8")).toBe("88");
 });
 
 test("constant mask", () => {

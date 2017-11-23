@@ -60,22 +60,27 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
         if (mask.length === 0 || value.length === 0)
             return [...result, ..._suffix(mask)];
         const [maskChar, ...restMask] = mask;
+        const [valueChar, ...restValue] = value;
         if (!isConstant(maskChar)) {
             const trans = translation[maskChar];
-            const [valueChar, ...restValue] = value;
             if (valueChar.match(trans.pattern)) {
                 if (trans.recursive) {
                     if (!resetPos)
                         resetPos = mask;
                     else if (mask.length === 1)
-                        return _maskIt(resetPos, restValue, [...result, valueChar], resetPos);
+                        return _maskIt(resetPos, restValue, [...result, valueChar], null);
                 }
                 return _maskIt(restMask, restValue, [...result, valueChar], resetPos);
             }
-            if (trans.optional)
+            if (trans.optional) {
+                if (!resetPos)
+                    resetPos = mask;
                 return _maskIt(restMask, value, result, resetPos);
+            }
             return _maskIt(mask, restValue, result, resetPos);
         }
+        if (resetPos && translation[resetPos[0]].optional && maskChar !== valueChar)
+            return _maskIt(resetPos, restValue, result, null);
         return _maskIt(restMask, value, [...result, maskChar], resetPos);
     }
 
