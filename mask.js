@@ -9,6 +9,7 @@ const translation = {
     "0": {pattern: /\d/},
     "#": {pattern: /\d/, recursive: true},
     "9": {pattern: /\d/, optional: true},
+    "S": {pattern: /[a-zA-Z]/},
 };
 const placeholderChar = "_";
 

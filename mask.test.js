@@ -237,3 +237,9 @@ test("direct unmask with fixed placeholder", () => {
     expect(Masker.unmasked(Masker.masked("6685333502"))).toBe("6685333502");
     expect(Masker.unmasked(Masker.masked("66853335023"))).toBe("66853335023");
 });
+
+test("direct mask with alphanumeric characters", () => {
+    const issn = "0000-000S";
+    const Masker = MaskImp(issn);
+    expect(Masker.masked("2434561X")).toBe("2434-561X");
+});
