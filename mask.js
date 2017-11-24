@@ -5,7 +5,7 @@ String.prototype.replaceAll = function (str1, str2, ignore) {
     );
 };
 
-const translation = {
+const defaultTranslation = {
     "0": {pattern: /\d/},
     "#": {pattern: /\d/, recursive: true},
     "9": {pattern: /\d/, optional: true},
@@ -15,21 +15,9 @@ const placeholderChar = "_";
 
 const reversed = (f, reverse = true) => (...params) => reverse ? f(...params.map(p => p.reverse())).reverse() : f(...params);
 
-const breakAffix = rawMask => {
-    let startMaskIndex = rawMask.findIndex(m => !isConstant(m));
-    startMaskIndex = startMaskIndex > -1 ? startMaskIndex : rawMask.length;
-    let endMaskIndex = rawMask.length - rawMask.slice().reverse().findIndex(m => !isConstant(m));
-    endMaskIndex = endMaskIndex <= rawMask.length ? endMaskIndex : rawMask.length;
-
-    return {
-        prefix: rawMask.slice(0, startMaskIndex),
-        mask: rawMask.slice(startMaskIndex, endMaskIndex),
-        suffix: rawMask.slice(endMaskIndex),
-    };
-};
-
-const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = false, placeholder = false} = {}) => {
+const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = false, placeholder = false, dict = {}} = {}) => {
     const _mask = typeof mask === 'function' ? mask : () => mask;
+    const translation = Object.assign({}, defaultTranslation, dict);
 
     return {
         masked: (value = "") => {
@@ -85,6 +73,19 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
         return _maskIt(restMask, value, [...result, maskChar], resetPos);
     }
 
+    function breakAffix(rawMask) {
+        let startMaskIndex = rawMask.findIndex(m => !isConstant(m));
+        startMaskIndex = startMaskIndex > -1 ? startMaskIndex : rawMask.length;
+        let endMaskIndex = rawMask.length - rawMask.slice().reverse().findIndex(m => !isConstant(m));
+        endMaskIndex = endMaskIndex <= rawMask.length ? endMaskIndex : rawMask.length;
+
+        return {
+            prefix: rawMask.slice(0, startMaskIndex),
+            mask: rawMask.slice(startMaskIndex, endMaskIndex),
+            suffix: rawMask.slice(endMaskIndex),
+        };
+    }
+
     function _suffix(mask = []) {
         if (placeholder)
             return mask.map(m => !isConstant(m) ? placeholderChar : m);
@@ -96,10 +97,10 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
             return [mask[0]];
         return [];
     }
-};
 
-function isConstant(maskChar = "") {
-    return !translation[maskChar];
-}
+    function isConstant(maskChar = "") {
+        return !translation[maskChar];
+    }
+};
 
 module.exports = MaskImpFactory;

@@ -238,8 +238,14 @@ test("direct unmask with fixed placeholder", () => {
     expect(Masker.unmasked(Masker.masked("66853335023"))).toBe("66853335023");
 });
 
-test("direct mask with alphanumeric characters", () => {
+test("direct mask with alphabetic characters", () => {
     const issn = "0000-000S";
     const Masker = MaskImp(issn);
-    expect(Masker.masked("2434561X")).toBe("2434-561X");
+    expect(Masker.masked("24345618X")).toBe("2434-561X");
+});
+
+test("mask with extension", () => {
+    const hexa = "HHHH";
+    const Masker = MaskImp(hexa, {dict: {"H": {pattern: /[\da-fA-F]/}}});
+    expect(Masker.masked("0FG9Ah")).toBe("0F9A");
 });
