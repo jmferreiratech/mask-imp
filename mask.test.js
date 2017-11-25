@@ -249,3 +249,9 @@ test("mask with extension", () => {
     const Masker = MaskImp(hexa, {dict: {"H": {pattern: /[\da-fA-F]/}}});
     expect(Masker.masked("0FG9Ah")).toBe("0F9A");
 });
+
+test("mask with escaped char", () => {
+    const hexa = "!0!xHHHH!!";
+    const Masker = MaskImp(hexa, {dict: {"H": {pattern: /[\da-fA-F]/}}});
+    expect(Masker.masked("0FG9Ah")).toBe("0x0F9A!");
+});

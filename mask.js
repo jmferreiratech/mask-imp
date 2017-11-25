@@ -12,6 +12,7 @@ const defaultTranslation = {
     "S": {pattern: /[a-zA-Z]/},
 };
 const placeholderChar = "_";
+const escapeChar = "!";
 
 const reversed = (f, reverse = true) => (...params) => reverse ? f(...params.map(p => p.reverse())).reverse() : f(...params);
 
@@ -68,15 +69,19 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
             }
             return _maskIt(mask, restValue, result, resetPos);
         }
+        if (maskChar === escapeChar) {
+            const [head, ...rest] = restMask;
+            return _maskIt(rest, value, [...result, head], resetPos);
+        }
         if (resetPos && translation[resetPos[0]].optional && maskChar !== valueChar)
             return _maskIt(resetPos, restValue, result, null);
         return _maskIt(restMask, value, [...result, maskChar], resetPos);
     }
 
     function breakAffix(rawMask) {
-        let startMaskIndex = rawMask.findIndex(m => !isConstant(m));
+        let startMaskIndex = rawMask.findIndex(m => !isConstant(m) || m === escapeChar);
         startMaskIndex = startMaskIndex > -1 ? startMaskIndex : rawMask.length;
-        let endMaskIndex = rawMask.length - rawMask.slice().reverse().findIndex(m => !isConstant(m));
+        let endMaskIndex = rawMask.length - rawMask.slice().reverse().findIndex(m => !isConstant(m) || m === escapeChar);
         endMaskIndex = endMaskIndex <= rawMask.length ? endMaskIndex : rawMask.length;
 
         return {
