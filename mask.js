@@ -67,6 +67,12 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
                     resetPos = mask;
                 return _maskIt(restMask, value, result, resetPos);
             }
+            if (trans.recursive) {
+                return _maskIt(withoutRecursiveChunk(mask), value, result, resetPos);
+            }
+            if (trans.fallback) {
+                return _maskIt(restMask, value, [...result, trans.fallback], resetPos);
+            }
             return _maskIt(mask, restValue, result, resetPos);
         }
         if (maskChar === escapeChar) {
@@ -82,8 +88,7 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
         let startMaskIndex = rawMask.findIndex(m => !isConstant(m) || m === escapeChar);
         startMaskIndex = startMaskIndex > -1 ? startMaskIndex : rawMask.length;
         let endMaskIndex = rawMask.length - rawMask.slice().reverse().findIndex(m => !isConstant(m) || m === escapeChar);
-        endMaskIndex = endMaskIndex <= rawMask.length ? endMaskIndex : rawMask.length;
-
+        endMaskIndex = Math.min(endMaskIndex, rawMask.length);
         return {
             prefix: rawMask.slice(0, startMaskIndex),
             mask: rawMask.slice(startMaskIndex, endMaskIndex),
@@ -94,13 +99,26 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
     function _suffix(mask = []) {
         if (placeholder)
             return mask.map(m => !isConstant(m) ? placeholderChar : m);
+        mask = withoutRecursiveChunk(mask);
         if (defaultValue) {
             const lastMapChar = mask.findIndex(m => !isConstant(m) && (translation[m].optional || translation[m].recursive));
             return mask.filter((m, i) => i < lastMapChar || lastMapChar === -1);
         }
         if (hint && isConstant(mask[0]))
             return [mask[0]];
+        if (!isConstant(mask[0]) && translation[mask[0]].fallback)
+            return [translation[mask[0]].fallback];
         return [];
+    }
+
+    function withoutRecursiveChunk(mask) {
+        const firstIndex = mask.findIndex(m => !isConstant(m) && translation[m].recursive);
+        if (firstIndex > -1) {
+            const lastIndex = mask.length - mask.slice().reverse().findIndex(m => !isConstant(m) && translation[m].recursive);
+            if (lastIndex <= mask.length)
+                return [...mask.slice(0, firstIndex), ...mask.slice(lastIndex)];
+        }
+        return mask;
     }
 
     function isConstant(maskChar = "") {

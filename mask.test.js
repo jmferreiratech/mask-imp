@@ -255,3 +255,12 @@ test("mask with escaped char", () => {
     const Masker = MaskImp(hexa, {dict: {"H": {pattern: /[\da-fA-F]/}}});
     expect(Masker.masked("0FG9Ah")).toBe("0x0F9A!");
 });
+
+test("mask with fallback", () => {
+    const number = "+#.##0,00";
+    const Masker = MaskImp(number, {dict: {"+": {pattern: /[+-]/, fallback: "+"}}, reverse: true});
+    expect(Masker.masked("1099")).toBe("+10,99");
+    expect(Masker.masked("+1099")).toBe("+10,99");
+    expect(Masker.masked("-1099")).toBe("-10,99");
+    expect(Masker.masked("x1099")).toBe("+10,99");
+});
