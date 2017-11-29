@@ -1,15 +1,18 @@
 {
-  "name": "mask-number",
+  "name": "mask-imp",
   "version": "1.0.0",
-  "description": "",
+  "description": "An imperative masking/formating component",
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jmarcelof/mask-imp.git"
+  },
   "author": "Marcelo Ferreira",
-  "license": "ISC",
-  "dependencies": {
-    "jest": "^21.2.1",
-    "jquery-mask-plugin": "^1.14.12"
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^21.2.1"
   }
 }
