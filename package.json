@@ -10,7 +10,16 @@
     "type": "git",
     "url": "https://github.com/jmarcelof/mask-imp.git"
   },
+  "bugs": {
+    "url": "https://github.com/jmarcelof/mask-imp/issues"
+  },
   "author": "Marcelo Ferreira",
+  "keywords": [
+    "mask",
+    "format",
+    "input",
+    "react"
+  ],
   "license": "MIT",
   "devDependencies": {
     "jest": "^21.2.1"
