@@ -1,1 +1,1 @@
-module.exports = require("./mask.js");
+module.exports = require("./dist/mask.js");

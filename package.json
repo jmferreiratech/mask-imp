@@ -4,7 +4,8 @@
   "description": "An imperative masking/formating component",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "babel mask.js -d dist"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
   ],
   "license": "MIT",
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
     "jest": "^21.2.1"
   }
 }
