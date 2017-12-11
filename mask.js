@@ -10,6 +10,9 @@ const defaultTranslation = {
     "#": {pattern: /\d/, recursive: true},
     "9": {pattern: /\d/, optional: true},
     "S": {pattern: /[a-zA-Z]/},
+    "~": {pattern: /[+-]/, fallback: "+"},
+    "^": {pattern: /[+-]/, optional: true},
+    "=": {pattern: /[-]/, optional: true},
 };
 const placeholderChar = "_";
 const escapeChar = "!";

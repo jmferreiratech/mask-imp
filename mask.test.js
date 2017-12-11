@@ -264,3 +264,30 @@ test("mask with fallback", () => {
     expect(Masker.masked("-1099")).toBe("-10,99");
     expect(Masker.masked("x1099")).toBe("+10,99");
 });
+
+test("mask with required sign", () => {
+    const number = "~#.##0,00";
+    const Masker = MaskImp(number, {reverse: true});
+    expect(Masker.masked("1099")).toBe("+10,99");
+    expect(Masker.masked("+1099")).toBe("+10,99");
+    expect(Masker.masked("-1099")).toBe("-10,99");
+    expect(Masker.masked("x1099")).toBe("+10,99");
+});
+
+test("mask with optional sign", () => {
+    const number = "^#.##0,00";
+    const Masker = MaskImp(number, {reverse: true});
+    expect(Masker.masked("1099")).toBe("10,99");
+    expect(Masker.masked("+1099")).toBe("+10,99");
+    expect(Masker.masked("-1099")).toBe("-10,99");
+    expect(Masker.masked("x1099")).toBe("10,99");
+});
+
+test("mask without '+' sign", () => {
+    const number = "=#.##0,00";
+    const Masker = MaskImp(number, {reverse: true});
+    expect(Masker.masked("1099")).toBe("10,99");
+    expect(Masker.masked("+1099")).toBe("10,99");
+    expect(Masker.masked("-1099")).toBe("-10,99");
+    expect(Masker.masked("x1099")).toBe("10,99");
+});
