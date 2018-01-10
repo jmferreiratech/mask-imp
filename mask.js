@@ -1,10 +1,3 @@
-String.prototype.replaceAll = function (str1, str2, ignore) {
-    return this.replace(
-        new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), (ignore ? "gi" : "g")),
-        (typeof(str2) === "string") ? str2.replace(/\$/g, "$$$$") : str2
-    );
-};
-
 const defaultTranslation = {
     "0": {pattern: /\d/},
     "#": {pattern: /\d/, recursive: true},
@@ -37,12 +30,12 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
             let result = index >= 0 ? value.slice(index) : "";
 
             if (placeholder)
-                result = result.replaceAll(placeholderChar, "");
+                result = replaceAll(result, placeholderChar, "");
 
             mask
                 .filter(isConstant)
                 .forEach(m => {
-                    result = result.replaceAll(m, "");
+                    result = replaceAll(result, m, "");
                 });
 
             return result;
@@ -128,5 +121,12 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
         return !translation[maskChar];
     }
 };
+
+function replaceAll(string, substr, newSubstr, ignore) {
+    return string.replace(
+        new RegExp(substr.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), (ignore ? "gi" : "g")),
+        (typeof(newSubstr) === "string") ? newSubstr.replace(/\$/g, "$$$$") : newSubstr
+    );
+}
 
 module.exports = MaskImpFactory;

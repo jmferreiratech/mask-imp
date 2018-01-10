@@ -4,15 +4,14 @@ function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-String.prototype.replaceAll = function (str1, str2, ignore) {
-    return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), ignore ? "gi" : "g"), typeof str2 === "string" ? str2.replace(/\$/g, "$$$$") : str2);
-};
-
 var defaultTranslation = {
     "0": { pattern: /\d/ },
     "#": { pattern: /\d/, recursive: true },
     "9": { pattern: /\d/, optional: true },
-    "S": { pattern: /[a-zA-Z]/ }
+    "S": { pattern: /[a-zA-Z]/ },
+    "~": { pattern: /[+-]/, fallback: "+" },
+    "^": { pattern: /[+-]/, optional: true },
+    "=": { pattern: /[-]/, optional: true }
 };
 var placeholderChar = "_";
 var escapeChar = "!";
@@ -72,10 +71,10 @@ var MaskImpFactory = function MaskImpFactory(mask) {
             });
             var result = index >= 0 ? value.slice(index) : "";
 
-            if (placeholder) result = result.replaceAll(placeholderChar, "");
+            if (placeholder) result = replaceAll(result, placeholderChar, "");
 
             mask.filter(isConstant).forEach(function (m) {
-                result = result.replaceAll(m, "");
+                result = replaceAll(result, m, "");
             });
 
             return result;
@@ -184,5 +183,9 @@ var MaskImpFactory = function MaskImpFactory(mask) {
         return !translation[maskChar];
     }
 };
+
+function replaceAll(string, substr, newSubstr, ignore) {
+    return string.replace(new RegExp(substr.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g, "\\$&"), ignore ? "gi" : "g"), typeof newSubstr === "string" ? newSubstr.replace(/\$/g, "$$$$") : newSubstr);
+}
 
 module.exports = MaskImpFactory;
