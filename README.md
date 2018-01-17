@@ -13,7 +13,9 @@ mask-imp is intended to mask any html input element, specially thought to be use
 ```
 import MaskImp from 'mask-imp';
 
-const mask = MaskImp("#.##0,00 €", {reverse: true});
+const pattern = "#.##0,00 €";
+const options = {reverse: true};
+const mask = MaskImp(pattern, options);
 
 mask.masked("154735975");
 // returns "1.547.359,75 €"
@@ -23,6 +25,27 @@ mask.unmasked("1.547.359,75 €");
 ```
 
 With react you'll usually use the `masked` method on an input's value attribute and the `unmasked` method before calling setState.
+
+#### Pattern dictionary
+The default pattern dictionary contains:
+* `0`: match a single digit
+* `9`: match zero or one digit (i.e optional)
+* `#`: match one or more digits (i.e recursive)
+* `S`: match a single alphabetic character (case insensitive)
+* `~`: match a single number signal ("+" or "-") and fallback to "+" (number always with signal)
+* `^`: match zero or one number signal (number with entered signal)
+* `=`: match zero or one negative number signal (number with negative signal only)
+
+To escape a dictionary character prefix it with "!".
+Any pattern character absent from the dictionary is considered constant.
+To examples of dictionary expansion see [the tests file](https://github.com/jmarcelof/mask-imp/blob/master/mask.test.js).
+
+#### Options values
+* `reverse` (default false): input characters are feed from right to left
+* `defaultValue` (default false): pattern characters are shown (except the recursive or optional ones)
+* `placeholder` (default false): non constant pattern characters are shown as "_"
+* `hint` (default false): shows the next const pattern character
+* `dict` (default {}): allows insertion of new items to the dictionary (see [tests](https://github.com/jmarcelof/mask-imp/blob/master/mask.test.js) to examples of expansion)
 
 ### Examples
 
@@ -73,7 +96,7 @@ ip.masked("192168.10.5");
 
 You can force the default value (zero) to be shown:
 ```
-const number = MaskImp("#.##0,00", {defaultValue: true, reverse: true});
+const number = MaskImp("#.##0.00", {defaultValue: true, reverse: true});
 
 number.masked("");
 // returns "0.00"
@@ -101,7 +124,7 @@ number.masked("668533350");
 
 You can also: use prefix and suffix, extend the default dictionary, escape digits, mask alphabetic characters, pass a function as mask expression...
 
-For more use cases, please look into the test file.
+For more use cases, please look into [the test file](https://github.com/jmarcelof/mask-imp/blob/master/mask.test.js).
 
 ### Dependencies
 It has no dependencies on jQuery or any other framework/library.
