@@ -108,9 +108,11 @@ const MaskImpFactory = (mask, {reverse = false, defaultValue = false, hint = fal
     }
 
     function withoutRecursiveChunk(mask) {
-        const firstIndex = mask.findIndex(m => !isConstant(m) && translation[m].recursive);
+        let firstIndex = mask.findIndex(m => !isConstant(m) && translation[m].recursive);
         if (firstIndex > -1) {
             const lastIndex = mask.length - mask.slice().reverse().findIndex(m => !isConstant(m) && translation[m].recursive);
+            if (firstIndex === lastIndex - 1)
+                firstIndex = 0;
             if (lastIndex <= mask.length)
                 return [...mask.slice(0, firstIndex), ...mask.slice(lastIndex)];
         }

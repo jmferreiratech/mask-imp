@@ -291,3 +291,15 @@ test("mask without '+' sign", () => {
     expect(Masker.masked("-1099")).toBe("-10,99");
     expect(Masker.masked("x1099")).toBe("10,99");
 });
+
+test("reverse recursive mask with default value and prefix", () => {
+    const money = "R$ #.##0,00";
+    const Masker = MaskImp(money, {defaultValue: true, reverse: true});
+    expect(Masker.masked("")).toBe("R$ 0,00");
+    expect(Masker.masked("1")).toBe("R$ 0,01");
+    expect(Masker.masked("12")).toBe("R$ 0,12");
+    expect(Masker.masked("123")).toBe("R$ 1,23");
+    expect(Masker.masked("1234")).toBe("R$ 12,34");
+    expect(Masker.masked("12345")).toBe("R$ 123,45");
+    expect(Masker.masked("123456")).toBe("R$ 1.234,56");
+});

@@ -172,6 +172,7 @@ var MaskImpFactory = function MaskImpFactory(mask) {
             var lastIndex = mask.length - mask.slice().reverse().findIndex(function (m) {
                 return !isConstant(m) && translation[m].recursive;
             });
+            if (firstIndex === lastIndex - 1) firstIndex = 0;
             if (lastIndex <= mask.length) return [].concat(_toConsumableArray(mask.slice(0, firstIndex)), _toConsumableArray(mask.slice(lastIndex)));
         }
         return mask;
